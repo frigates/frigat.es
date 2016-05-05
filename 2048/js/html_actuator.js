@@ -1,10 +1,15 @@
 function HTMLActuator() {
   this.tileContainer    = document.querySelector(".tile-container");
-  this.scoreContainer   = document.querySelector(".score-container");
-  this.bestContainer    = document.querySelector(".best-container");
+  this.scoreContainer   = document.querySelector(".score-points");
+  this.scoreLevel       = document.querySelector(".score-level");
+  this.bestContainer    = document.querySelector(".best-points");
+  this.bestLevelC       = document.querySelector(".best-level");
+  this.rankContainer    = document.querySelector(".rank-wrapper");
   this.messageContainer = document.querySelector(".game-message");
+  this.sharingContainer = document.querySelector(".score-sharing");
 
   this.score = 0;
+  this.level = 2;
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
@@ -20,9 +25,9 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
         }
       });
     });
-
-    self.updateScore(metadata.score);
-    self.updateBestScore(metadata.bestScore);
+    
+    self.updateBestScore(metadata.bestScore, metadata.bestLevel, metadata.level);
+    self.updateScore(metadata.score, metadata.level);
 
     if (metadata.terminated) {
       if (metadata.over) {
@@ -51,6 +56,7 @@ HTMLActuator.prototype.addTile = function (tile) {
 
   var wrapper   = document.createElement("div");
   var inner     = document.createElement("div");
+  var img       = document.createElement("img");
   var position  = tile.previousPosition || { x: tile.x, y: tile.y };
   var positionClass = this.positionClass(position);
 
@@ -62,7 +68,10 @@ HTMLActuator.prototype.addTile = function (tile) {
   this.applyClasses(wrapper, classes);
 
   inner.classList.add("tile-inner");
-  inner.textContent = tile.value;
+  // inner.textContent = tile.value;
+  // img.style.width = '100%';
+  img.src = "style/img/" + tile.value + ".jpg";
+  inner.appendChild(img);
 
   if (tile.previousPosition) {
     // Make sure that the tile gets rendered in the previous position first
@@ -103,25 +112,52 @@ HTMLActuator.prototype.positionClass = function (position) {
   return "tile-position-" + position.x + "-" + position.y;
 };
 
-HTMLActuator.prototype.updateScore = function (score) {
+HTMLActuator.prototype.updateScore = function (score, level) {
   this.clearContainer(this.scoreContainer);
+  this.clearContainer(this.scoreLevel);
+
+  // RANK UPDATE
+  var resetDivP = this.rankContainer.getElementsByClassName("tile-score-" + this.level)[0];
+  resetDivP.classList.remove("now");
+  var setDivP = this.rankContainer.getElementsByClassName("tile-score-" + level)[0];
+  setDivP.classList.add("now");  
 
   var difference = score - this.score;
+  var levelDifference = level - this.level;
   this.score = score;
+  this.scoreLevel.classList.remove('tile-score-' + this.level);
+  this.level = level;
+  this.scoreLevel.classList.add('tile-score-' + level);
 
   this.scoreContainer.textContent = this.score;
+  
+  // if (levelDifference > 0) {
+  //   var addition = document.createElement("div");
+  //   addition.classList.add("score-addition");
+  //   addition.textContent = caption( this.level );
+  //   this.scoreLevel.appendChild(addition);
+  // }
 
   if (difference > 0) {
-    var addition = document.createElement("div");
-    addition.classList.add("score-addition");
-    addition.textContent = "+" + difference;
-
-    this.scoreContainer.appendChild(addition);
+    var punti = document.createElement("div");
+    punti.classList.add("score-addition");
+    punti.textContent = "+" + difference;
+    this.scoreContainer.appendChild(punti);
   }
+
 };
 
-HTMLActuator.prototype.updateBestScore = function (bestScore) {
+HTMLActuator.prototype.updateBestScore = function (bestScore, bestLevel, level) {
+  // this.bestLevel.textContent = caption(bestLevel);
+  this.bestLevelC.classList.add("tile-score-" + bestLevel);
   this.bestContainer.textContent = bestScore;
+
+  // RANK UPDATE
+  var resetDivP = this.rankContainer.getElementsByClassName("tile-score-" + this.level)[0];
+  resetDivP.classList.remove("weired");
+  var resetDiv = this.rankContainer.getElementsByClassName("tile-score-" + bestLevel)[0];
+  resetDiv.classList.add("weired");
+
 };
 
 HTMLActuator.prototype.message = function (won) {
@@ -130,10 +166,29 @@ HTMLActuator.prototype.message = function (won) {
 
   this.messageContainer.classList.add(type);
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+  
+  this.clearContainer(this.sharingContainer);
+  this.sharingContainer.appendChild(this.scoreTweetButton());
+  twttr.widgets.load();
 };
 
 HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
+};
+
+HTMLActuator.prototype.scoreTweetButton = function () {
+  var tweet = document.createElement("a");
+  tweet.classList.add("twitter-share-button");
+  tweet.setAttribute("href", "https://twitter.com/share");
+  tweet.setAttribute("data-via", "giampiex");
+  tweet.setAttribute("data-url", "http://git.io/mundial");
+  tweet.setAttribute("data-counturl", "http://0x0800.github.io/2048-MUNDIAL");
+  tweet.textContent = "Tweet";
+
+  var text = "I scored " + this.score + "-" + caption(this.level).toUpperCase() + " at 2048-MUNDIAL #2048game #MUNDIAL";
+  tweet.setAttribute("data-text", text);
+
+  return tweet;
 };

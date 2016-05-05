@@ -1,42 +1,78 @@
 @import "helpers";
 @import "fonts/clear-sans.css";
 
+$color-arancio: #fc8c12;
+$color-verde: #146b22;
+$color-blue: #001f43;
+$color-verdino: #21951b;
+
 $field-width: 500px;
 $grid-spacing: 15px;
+$legend-spacing: $grid-spacing / 2;
 $grid-row-cells: 4;
 $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells;
 $tile-border-radius: 3px;
+$legend-border-radius: 2px;
 
 $mobile-threshold: $field-width + 20px;
 
-$text-color: #776E65;
-$bright-text-color: #f9f6f2;
+$text-color: #002955;
+$bright-text-color: #FFF;
+$points-text-color: $color-blue;
 
-$tile-color: #eee4da;
-$tile-gold-color: #edc22e;
-$tile-gold-glow-color: lighten($tile-gold-color, 15%);
+$tile-color: $color-verde;
+$tile-gold-color: #0CF;
+/* $tile-gold-glow-color: lighten($tile-gold-color, 15%); */
+$tile-gold-glow-color: $color-arancio;
 
-$game-container-margin-top: 40px;
-$game-container-background: #bbada0;
+$mix-perc: 75%;
+
+$game-container-margin-top: 11px;
+$game-container-background: $color-blue;
+
+$score-container-background: $color-verde;
 
 $transition-speed: 100ms;
+
+$base: 2;
+$limit: 11;
+
+// Colors for all 11 states, false = no special color
+$special-colors: false false, // 2
+                 false false, // 4
+                 false false, // 8
+                 false false, // 16
+                 false false, // 32
+                 false false, // 64
+                 false false, // 128
+                 false false, // 256
+                 false false, // 512
+                 false false, // 1024
+                 false false; // 2048
+
+$title-container-size: 30px;
 
 html, body {
   margin: 0;
   padding: 0;
 
-  background: #faf8ef;
+  background-color: #fff;
   color: $text-color;
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px;
 }
 
 body {
-  margin: 80px 0;
+  padding: 0px 0;
+  background-image: url(img/bg.png);
+  background-position: 50% 0px;
+  background-repeat: no-repeat;
+  background-size: 424px;
 }
 
 .heading {
   @include clearfix;
+  height: 262px;
 }
 
 h1.title {
@@ -44,7 +80,19 @@ h1.title {
   font-weight: bold;
   margin: 0;
   display: block;
-  float: left;
+  text-align: center;
+  
+  & small {
+    font-size: 60px;
+  }
+}
+
+.title-container {
+    
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+
 }
 
 @include keyframes(move-up) {
@@ -59,65 +107,72 @@ h1.title {
   }
 }
 
-.scores-container {
-  float: right;
-  text-align: right;
+p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  line-height: 1.65;
 }
 
 .score-container, .best-container {
-  $height: 25px;
+  $height: 19px;
 
+  .score-level, .best-level {
+    margin: 0px auto;
+    padding: 0px 0px;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .score-level, .best-level {
+    display: block;
+    font-size: 24px;
+  }
+
+  p {
+    line-height: $height;
+    display: inline-block;
+  }
+  //overflow: hidden;
   position: relative;
   display: inline-block;
-  background: $game-container-background;
-  padding: 15px 25px;
+  background: transparent;
+  padding: 0px;
   font-size: $height;
-  height: $height;
-  line-height: $height + 22px;
+  text-transform: uppercase;
+  //height: $height;
+  //line-height: $height + 22px;
   font-weight: bold;
   border-radius: 3px;
-  color: white;
-  margin-top: 8px;
+  color: $color-blue;
+  margin-top: 35px;
   text-align: center;
-
-  &:after {
-    position: absolute;
-    width: 100%;
-    top: 10px;
-    left: 0;
-    text-transform: uppercase;
-    font-size: 13px;
-    line-height: 13px;
-    text-align: center;
-    color: $tile-color;
+  width: 35%;
+  float: left;
+  
+  .caption {
+    font-size: 14px;
+    color: $color-verde;
   }
 
   .score-addition {
     position: absolute;
-    right: 30px;
-    color: red;
-    font-size: $height;
+    top: 37px;
+    // width: 100%;
+    font-size: inherit;
     line-height: $height;
     font-weight: bold;
-    color: rgba($text-color, .9);
+    color: $color-verde;
     z-index: 100;
     @include animation(move-up 600ms ease-in);
     @include animation-fill-mode(both);
   }
 }
 
-.score-container:after {
-  content: "Score";
-}
-
-.best-container:after {
-  content: "Best"
-}
-
-p {
-  margin-top: 0;
-  margin-bottom: 10px;
-  line-height: 1.65;
+.best-container {
+  float: right;
+  .caption{
+    color: $color-arancio;
+  }
 }
 
 a {
@@ -135,7 +190,7 @@ strong {
 
 hr {
   border: none;
-  border-bottom: 1px solid lighten($text-color, 40%);
+  border-bottom: 1px solid lighten($game-container-background, 15%);
   margin-top: 20px;
   margin-bottom: 30px;
 }
@@ -158,11 +213,11 @@ hr {
 // Styles for buttons
 @mixin button {
   display: inline-block;
-  background: darken($game-container-background, 20%);
+  background: $color-arancio;
   border-radius: 3px;
   padding: 0 20px;
   text-decoration: none;
-  color: $bright-text-color;
+  color: $points-text-color;
   height: 40px;
   line-height: 42px;
 }
@@ -201,7 +256,7 @@ hr {
       right: 0;
       bottom: 0;
       left: 0;
-      background: rgba($tile-color, .5);
+      background: rgba($tile-color, .7);
       z-index: 100;
 
       text-align: center;
@@ -230,6 +285,12 @@ hr {
 	  display: none;
 	}
       }
+      
+      .score-sharing {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+      }
 
       @include animation(fade-in 800ms ease $transition-speed * 12);
       @include animation-fill-mode(both);
@@ -238,13 +299,16 @@ hr {
         background: rgba($tile-gold-color, .5);
         color: $bright-text-color;
 
-	a.keep-playing-button {
-	  display: inline-block;
-	}
+      	a.keep-playing-button {
+      	  display: inline-block;
+      	}
       }
 
       &.game-won, &.game-over {
         display: block;
+      }
+      &.game-over p{
+        color: white;
       }
     }
   }
@@ -276,7 +340,8 @@ hr {
 
     border-radius: $tile-border-radius;
 
-    background: rgba($tile-color, .35);
+    // background: rgba($tile-color, .35);
+    background: rgba($color-verdino, 1);
 
     &:last-child {
       margin-right: 0;
@@ -292,7 +357,7 @@ hr {
     &, .tile-inner {
       width: ceil($tile-size);
       height: ceil($tile-size);
-      line-height: ceil($tile-size);
+      line-height: $tile-size + 10px;
     }
 
     // Build position classes
@@ -323,6 +388,12 @@ hr {
     z-index: 10;
 
     font-size: 55px;
+    
+    img {
+      border-radius: $tile-border-radius;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   // Movement transition
@@ -331,23 +402,8 @@ hr {
   -moz-transition-property: -moz-transform;
   transition-property: transform;
 
-  $base: 2;
   $exponent: 1;
-  $limit: 11;
-
-  // Colors for all 11 states, false = no special color
-  $special-colors: false false, // 2
-                   false false, // 4
-                   #f78e48 true, // 8
-                   #fc5e2e true, // 16
-                   #ff3333 true, // 32
-                   #ff0000 true, // 64
-                   false true, // 128
-                   false true, // 256
-                   false true, // 512
-                   false true, // 1024
-                   false true; // 2048
-
+  
   // Build tile colors
   @while $exponent <= $limit {
     $power: pow($base, $exponent);
@@ -363,7 +419,7 @@ hr {
       $bright-color: nth($nth-color, 2);
 
       @if $special-background {
-        $mixed-background: mix($special-background, $mixed-background, 55%);
+        $mixed-background: mix($special-background, $mixed-background, $mix-perc);
       }
 
       @if $bright-color {
@@ -371,7 +427,8 @@ hr {
       }
 
       // Set background
-      background: $mixed-background;
+      // background: $mixed-background;
+      background: white;
 
       // Add glow
       $glow-opacity: max($exponent - 4, 0) / ($limit - 4);
@@ -395,6 +452,10 @@ hr {
         @include smaller($mobile-threshold) {
           font-size: 15px;
         }
+      }
+      
+      img{
+        //opacity: (($exponent - 1) / 30) + .7;
       }
     }
 
@@ -453,23 +514,168 @@ hr {
 
 .above-game {
   @include clearfix;
+  text-align: center;
 }
 
 .game-intro {
   float: left;
+  font-size: 25px;
   line-height: 42px;
   margin-bottom: 0;
+  margin-top: 5px;
 }
 
-.restart-button {
+.restart-button, .undo-button {
   @include button;
-  display: block;
+  display: inline-block;
   text-align: center;
-  float: right;
 }
 
 .game-explanation {
   margin-top: 50px;
+}
+
+// -----------------------------------------------  ADDED
+
+.legend-row {
+  padding: 10px 5px;
+  @include clearfix;
+  
+  p {
+    margin-left: ($field-width / 3);
+    // margin-top: ($field-width / 12);
+    margin-top: 11px;
+    text-transform: uppercase;
+  }
+}
+
+.legend-grid {
+  position: relative;
+  padding: $legend-spacing;
+
+  cursor: default;
+  -webkit-touch-callout: none;
+  -ms-touch-callout: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  -ms-touch-action: none;
+  touch-action: none;
+
+  background: $game-container-background;
+  border-radius: $legend-border-radius * 2;
+  width: ($field-width / 4) + $legend-border-radius * 2 - 1;
+  height: ($field-width / 4) + $legend-border-radius * 2 - 1;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  float: left;
+}
+
+.legend-cell {
+  width: $tile-size;
+  height: $tile-size;
+  margin-right: $legend-spacing;
+  float: left;
+
+  border-radius: $tile-border-radius;
+
+  background: rgba($tile-color, .35);
+  
+  img {
+    border-radius: $tile-border-radius;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.rank-container{
+  @include clearfix;
+  margin-bottom: 10px;
+}
+
+.rank-cell {
+  width: $tile-size / 1.6;
+  height: $tile-size / 1.6;
+  margin: 0px 3.7px;
+  float: left;
+  border-radius: $tile-border-radius / 1.2;
+
+  background: rgba($tile-color, .35);
+  border: 1px solid white;
+
+}
+
+.weired{
+  box-shadow: 0 0 0px 2px $color-arancio, inset 0 0 0 0px rgba(white, .5);  
+}
+.now{
+  box-shadow: 0 0 0px 2px $color-verde, inset 0 0 0 0px rgba(white, .5);    
+}
+
+$exponent: 1;
+
+// Build tile colors
+@while $exponent <= $limit {
+  $power: pow($base, $exponent);
+
+  .cell-#{$power} {
+    // Calculate base background color
+    $gold-percent: ($exponent - 1) / ($limit - 1) * 100;
+    $mixed-background: mix($tile-gold-color, $tile-color, $gold-percent);
+
+    $nth-color: nth($special-colors, $exponent);
+
+    $special-background: nth($nth-color, 1);
+    $bright-color: nth($nth-color, 2);
+
+    @if $special-background {
+      $mixed-background: mix($special-background, $mixed-background, $mix-perc);
+    }
+
+    @if $bright-color {
+      color: $bright-text-color;
+    }
+
+    // Set background
+    // background: $mixed-background;
+    background-color: white;
+
+    // Add glow
+    $glow-opacity: max($exponent - 4, 0) / ($limit - 4);
+
+    @if not $special-background {
+      box-shadow: 0 0 30px 5px rgba($tile-gold-glow-color, $glow-opacity / 1.8),
+                  inset 0 0 0 1px rgba(white, $glow-opacity / 3);
+    }
+  }
+
+  .tile-score-#{$power} {
+    background-image: url("img/" + $power + ".jpg");
+    background-size: cover;
+    background-position: center center;
+    background-color: white;
+    display: block;
+  }
+
+  // .best-container .tile-score-#{$power} {
+  //   float: right;
+  // }
+
+  // .score-container .tile-score-#{$power} {
+  //   float: left;
+  // }
+
+  $exponent: $exponent + 1;
+}
+
+.repo-link {
+  margin-top: 40px;
+  margin-right: 20px;
+  text-align: right;
 }
 
 @include smaller($mobile-threshold) {
@@ -488,11 +694,38 @@ hr {
   body {
     margin: 20px 0;
     padding: 0 20px;
+    background-size: 284px;
+    // background-position: 50% top;
   }
 
   h1.title {
     font-size: 27px;
     margin-top: 15px;
+    
+    & small {
+      font-size: 27px;
+    }
+  }
+
+  .heading{
+    height:172px;
+  }
+
+  .rank-cell {
+    width: $tile-size / 2;
+    height: $tile-size / 2;
+    margin: 4px;
+    float: left;
+    border-radius: $tile-border-radius / 1.2;
+
+    background: rgba($tile-color, .35);
+    border: 1px solid white;
+
+  }
+
+  .score-container .score-level, .score-container .best-level, .best-container .score-level, .best-container .best-level{
+    width:50px;
+    height: 50px;
   }
 
   .container {
@@ -502,28 +735,34 @@ hr {
 
   .score-container, .best-container {
     margin-top: 0;
-    padding: 15px 10px;
+    padding: 0px 0px;
     min-width: 40px;
   }
 
   .heading {
     margin-bottom: 10px;
   }
+  .above-game{
 
+  }
   // Show intro and restart button side by side
   .game-intro {
     width: 55%;
     display: block;
     box-sizing: border-box;
     line-height: 1.65;
+    font-size: 16px;
+    margin-top: 0px;
   }
 
-  .restart-button {
-    width: 42%;
-    padding: 0;
-    display: block;
-    box-sizing: border-box;
-    margin-top: 2px;
+  .restart-button, .undo-button {
+    padding: 0 47px;
+  }
+  .restart-button{
+    float: right;
+  }
+  .undo.button{
+    float: left;
   }
 
   // Render the game field at the right width
@@ -545,5 +784,160 @@ hr {
     .lower {
       margin-top: 30px !important;
     }
+    
+    &.game-won .score-sharing {
+      margin-top: 10px;
+    }
   }
+  
+  .legend-row p {
+    //margin-top: 0px !important;
+  }
+}
+
+.legend-row {
+  padding: 10px 5px;
+  @include clearfix;
+  
+  p {
+    margin-left: ($field-width / 3);
+    // margin-top: ($field-width / 12);
+    margin-top: 11px;
+    text-transform: uppercase;
+  }
+}
+
+.legend-grid {
+  position: relative;
+  padding: $legend-spacing;
+
+  cursor: default;
+  -webkit-touch-callout: none;
+  -ms-touch-callout: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  -ms-touch-action: none;
+  touch-action: none;
+
+  background: $game-container-background;
+  border-radius: $legend-border-radius * 2;
+  width: ($field-width / 4) + $legend-border-radius * 2 - 1;
+  height: ($field-width / 4) + $legend-border-radius * 2 - 1;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  float: left;
+}
+
+.legend-cell {
+  width: $tile-size;
+  height: $tile-size;
+  margin-right: $legend-spacing;
+  float: left;
+
+  border-radius: $tile-border-radius;
+
+  background: rgba($tile-color, .35);
+  
+  img {
+    border-radius: $tile-border-radius;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.rank-container{
+  @include clearfix;
+  margin-bottom: 10px;
+}
+
+.rank-cell {
+  width: $tile-size / 1.6;
+  height: $tile-size / 1.6;
+  margin: 0px 3.7px;
+  float: left;
+  border-radius: $tile-border-radius / 1.2;
+
+  background: rgba($tile-color, .35);
+  border: 1px solid white;
+
+}
+
+@include smaller($mobile-threshold) {
+  .rank-cell{
+    margin: 3px 3.7px;
+  }
+}
+
+.weired{
+  box-shadow: 0 0 0px 2px $color-arancio, inset 0 0 0 0px rgba(white, .5);  
+}
+.now{
+  box-shadow: 0 0 0px 2px $color-verde, inset 0 0 0 0px rgba(white, .5);    
+}
+
+$exponent: 1;
+
+// Build tile colors
+@while $exponent <= $limit {
+  $power: pow($base, $exponent);
+
+  .cell-#{$power} {
+    // Calculate base background color
+    $gold-percent: ($exponent - 1) / ($limit - 1) * 100;
+    $mixed-background: mix($tile-gold-color, $tile-color, $gold-percent);
+
+    $nth-color: nth($special-colors, $exponent);
+
+    $special-background: nth($nth-color, 1);
+    $bright-color: nth($nth-color, 2);
+
+    @if $special-background {
+      $mixed-background: mix($special-background, $mixed-background, $mix-perc);
+    }
+
+    @if $bright-color {
+      color: $bright-text-color;
+    }
+
+    // Set background
+    // background: $mixed-background;
+    background-color: white;
+
+    // Add glow
+    $glow-opacity: max($exponent - 4, 0) / ($limit - 4);
+
+    @if not $special-background {
+      box-shadow: 0 0 30px 5px rgba($tile-gold-glow-color, $glow-opacity / 1.8),
+                  inset 0 0 0 1px rgba(white, $glow-opacity / 3);
+    }
+  }
+
+  .tile-score-#{$power} {
+    background-image: url("img/" + $power + ".jpg");
+    background-size: cover;
+    background-position: center center;
+    background-color: white;
+    display: block;
+  }
+
+  // .best-container .tile-score-#{$power} {
+  //   float: right;
+  // }
+
+  // .score-container .tile-score-#{$power} {
+  //   float: left;
+  // }
+
+  $exponent: $exponent + 1;
+}
+
+.repo-link {
+  margin-top: 40px;
+  margin-right: 20px;
+  text-align: right;
 }

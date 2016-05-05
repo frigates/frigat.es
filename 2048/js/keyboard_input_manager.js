@@ -46,7 +46,8 @@ KeyboardInputManager.prototype.listen = function () {
     87: 0, // W
     68: 1, // D
     83: 2, // S
-    65: 3  // A
+    65: 3, // A
+    90:-1 // Z (undo)
   };
 
   // Respond to direction keys
@@ -69,6 +70,7 @@ KeyboardInputManager.prototype.listen = function () {
   });
 
   // Respond to button presses
+/*   this.bindButtonPress(".crowd-button", this.crowd); */
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
@@ -79,7 +81,7 @@ KeyboardInputManager.prototype.listen = function () {
 
   gameContainer.addEventListener(this.eventTouchstart, function (event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
-        event.targetTouches.length > 1) {
+        event.targetTouches > 1) {
       return; // Ignore if touching with more than 1 finger
     }
 
@@ -100,7 +102,7 @@ KeyboardInputManager.prototype.listen = function () {
 
   gameContainer.addEventListener(this.eventTouchend, function (event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
-        event.targetTouches.length > 0) {
+        event.targetTouches > 0) {
       return; // Ignore if still touching with one or more fingers
     }
 
@@ -135,6 +137,11 @@ KeyboardInputManager.prototype.restart = function (event) {
 KeyboardInputManager.prototype.keepPlaying = function (event) {
   event.preventDefault();
   this.emit("keepPlaying");
+};
+
+KeyboardInputManager.prototype.crowd = function (event) {
+  event.preventDefault();
+  this.emit("crowd");
 };
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {

@@ -50,7 +50,10 @@
       }
 
       return this.contains(token);
-    }
+    },
+    run: function () {
+      return join.call(this, ' ');
+    },
   };
 
   window.DOMTokenList = DOMTokenList;
